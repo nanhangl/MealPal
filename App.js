@@ -16,6 +16,7 @@ import ResolveAuthScreen from './src/screens/ResolveAuthScreen';
 import { Provider as LocationProvider } from './src/context/LocationContext';
 import { Provider as TrackProvider } from './src/context/TrackContext';
 import { FontAwesome } from '@expo/vector-icons';
+import AddMealScreen from './src/screens/AddMealScreen';
 
 const homeFlow = createStackNavigator({
   Home: HomeScreen,
@@ -39,6 +40,9 @@ const switchNavigator = createSwitchNavigator({
     History: HistoryScreen,
     Account: AccountScreen,
   }),
+  chefFlow: createStackNavigator({
+    AddMeal: AddMealScreen
+  })
 });
 
 const App = createAppContainer(switchNavigator);

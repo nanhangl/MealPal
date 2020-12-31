@@ -1,4 +1,4 @@
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import createDataContext from './createDataContext';
 import mealpalApi from '../api/mealpal';
 import { navigate } from '../navigationRef';
@@ -33,10 +33,11 @@ const clearErrorMessage = dispatch => () => {
 };
 
 const signup = dispatch => async ({ role, email, phone, line1, line2, postal }) => {
-  console.log(role, email, phone, line1, line2, postal)
   try {
     const response = await mealpalApi.post('/signup', { role, email, phone, line1, line2, postal });
     await AsyncStorage.setItem('token', response.data.token);
+    await AsyncStorage.setItem('role', role);
+    await AsyncStorage.setItem('email', email);
     dispatch({ type: 'signin', payload: response.data.token });
 
     navigate('Home');
@@ -52,6 +53,8 @@ const signin = dispatch => async ({ role, email }) => {
   try {
     const response = await mealpalApi.post('/signin', { role, email });
     await AsyncStorage.setItem('token', response.data.token);
+    await AsyncStorage.setItem('role', role);
+    await AsyncStorage.setItem('email', email);
     dispatch({ type: 'signin', payload: response.data.token });
     navigate('Home');
   } catch (err) {
