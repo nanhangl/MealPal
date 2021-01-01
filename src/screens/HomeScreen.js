@@ -1,16 +1,28 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Text, FlatList, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, FlatList, TouchableOpacity, View, Image } from 'react-native';
 import NavigateButton from '../components/NavigateButton';
 import { NavigationEvents } from 'react-navigation';
 import getChef from '../api/getChef'
 import { ListItem } from 'react-native-elements';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-community/async-storage';
+import getChefOrders from '../api/getChefOrders';
 
 const HomeScreen = ({ navigation }) => {
   const [role, setRole] = useState('');
   const [email, setEmail] = useState('');
   const [chefMeal, setChefMeal] = useState({});
+  const [chefOrders, setChefOrders] = useState('');
+  const [allChef, setAllChef] = useState('');
+
+  const orderItem = ({ item }) => (
+    item._id == "no_orders" ? <Text style={{marginLeft:10,fontSize:20}}>No Orders</Text> : <TouchableOpacity>
+      <View style={styles.orderItem}>
+        <Text style={styles.orderItemEmail}>{item.title}</Text>
+        <Feather name="chevron-right" size={30} style={{marginLeft:'auto'}} />
+      </View>
+    </TouchableOpacity>
+  );
 
   useState(() => {
     AsyncStorage.getItem('role').then(r => {
@@ -18,18 +30,23 @@ const HomeScreen = ({ navigation }) => {
     })
     AsyncStorage.getItem('email').then(async e => {
       setEmail(e)
-      var chefObj = await getChef(e);
-      setChefMeal({
-        mealType: chefObj[0].mealType,
-        image: chefObj[0].image,
-        title: chefObj[0].title,
-        description: chefObj[0].description,
-        ingredients: chefObj[0].ingredients,
-        calories: chefObj[0].calories,
-        carbs: chefObj[0].carbs,
-        fats: chefObj[0].fats,
-        protein: chefObj[0].protein
-      })
+        var chefObj = await getChef(e);
+        setChefMeal({
+          mealType: chefObj[0].mealType,
+          image: chefObj[0].image,
+          title: chefObj[0].title,
+          description: chefObj[0].description,
+          ingredients: chefObj[0].ingredients,
+          calories: chefObj[0].calories,
+          carbs: chefObj[0].carbs,
+          fats: chefObj[0].fats,
+          protein: chefObj[0].protein
+        })
+        var callGetChefOrders = await getChefOrders(e);
+        setChefOrders(callGetChefOrders);
+        if (chefOrders.length == 0) {
+          setChefOrders([{_id:'no_orders', title: "No Orders"}])
+        }
     })
   })
 
@@ -40,7 +57,18 @@ const HomeScreen = ({ navigation }) => {
   } else if (role == "Chef") {
     if (chefMeal.mealType) {
       return (
-        <Text>yay Chef</Text>
+        <View>
+          <Text style={{fontSize:16,fontWeight:'bold',marginLeft:9,color:'#86939e',marginVertical:10}}>Your Meal</Text>
+          <View style={styles.chefMeal}>
+            <Image source={{uri: chefMeal.image}} style={{width: 100, height: 75}} />
+            <Text style={{marginLeft:20,fontSize:16,fontWeight:'bold',width:250}}>{chefMeal.title}</Text>
+          </View>
+          <Text style={{fontSize:16,fontWeight:'bold',marginLeft:9,color:'#86939e',marginBottom:10}}>Orders</Text>
+          <FlatList
+          data={chefOrders}
+          keyExtractor={item => item._id}
+          renderItem={orderItem} />
+        </View>
       )
     } else {
       return (
@@ -78,6 +106,25 @@ const styles = StyleSheet.create({
   },
   spacing: {
     marginTop: 30
+  },
+  chefMeal: {
+    flexDirection: 'row',
+    marginHorizontal: 10,
+    marginBottom: 20,
+    alignItems: 'center'
+  },
+  orderItem: {
+    marginHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderTopColor: '#c0c0c0',
+    borderTopWidth: 1,
+    borderBottomColor: '#c0c0c0',
+    borderBottomWidth: 1,
+    height: 70
+  },
+  orderItemEmail: {
+    fontSize: 20
   }
 });
 
