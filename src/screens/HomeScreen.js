@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Text, FlatList, TouchableOpacity, View, Image } from 'react-native';
+import { StyleSheet, Text, FlatList, TouchableOpacity, View, Image, ScrollView } from 'react-native';
 import NavigateButton from '../components/NavigateButton';
 import { NavigationEvents } from 'react-navigation';
 import getChef from '../api/getChef'
@@ -7,6 +7,8 @@ import { ListItem } from 'react-native-elements';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-community/async-storage';
 import getChefOrders from '../api/getChefOrders';
+import getAllChef from '../api/getAllChef';
+import { navigate } from '../navigationRef';
 
 const HomeScreen = ({ navigation }) => {
   const [role, setRole] = useState('');
@@ -14,6 +16,7 @@ const HomeScreen = ({ navigation }) => {
   const [chefMeal, setChefMeal] = useState({});
   const [chefOrders, setChefOrders] = useState('');
   const [allChef, setAllChef] = useState('');
+
 
   const orderItem = ({ item }) => (
     item._id == "no_orders" ? <Text style={{marginLeft:10,fontSize:20}}>No Orders</Text> : <TouchableOpacity>
@@ -24,7 +27,7 @@ const HomeScreen = ({ navigation }) => {
     </TouchableOpacity>
   );
 
-  useState(() => {
+  useState(async () => {
     AsyncStorage.getItem('role').then(r => {
       setRole(r)
     })
@@ -48,11 +51,64 @@ const HomeScreen = ({ navigation }) => {
           setChefOrders([{_id:'no_orders', title: "No Orders"}])
         }
     })
+    var callGetAllChef = await getAllChef();
+    setAllChef(callGetAllChef);
   })
 
   if (role == "Customer") {
     return (
-      <Text>yay Cust</Text>
+      <View>
+        <Text style={{marginLeft:10,fontWeight:'bold',fontSize:18}}>Keto</Text>
+        <ScrollView>
+        <FlatList horizontal data={allChef[0]} keyExtractor={item => item._id} renderItem={({item}) => {
+            return(
+              <TouchableOpacity onPress={() => navigation.navigate('MealDetail', {email:item.email}) }>
+              <View style={{marginHorizontal:10,marginVertical:10}}>
+              <Image source={{uri: item.image}} style={{width:199,height:166}} />
+              <Text style={{width: 195,marginTop:10,fontWeight:'bold'}}>{item.title}</Text>
+              </View>
+              </TouchableOpacity>
+            );
+          }}/>
+          </ScrollView>
+        <Text style={{marginLeft:10,fontWeight:'bold',fontSize:18}}>Low Carbs</Text>
+        <ScrollView>
+        <FlatList horizontal data={allChef[1]} keyExtractor={item => item._id} renderItem={({item}) => {
+            return(
+              <TouchableOpacity onPress={() => navigation.navigate('MealDetail', {email:item.email}) }>
+              <View style={{marginHorizontal:10,marginVertical:10}}>
+              <Image source={{uri: item.image}} style={{width:199,height:166}} />
+              <Text style={{width: 195,marginTop:10,fontWeight:'bold'}}>{item.title}</Text>
+              </View>
+              </TouchableOpacity>
+            );
+          }}/>
+          </ScrollView>
+        <Text style={{marginLeft:10,fontWeight:'bold',fontSize:18}}>Low Calories</Text>
+        <ScrollView>
+        <FlatList horizontal data={allChef[2]} keyExtractor={item => item._id} renderItem={({item}) => {
+            return(
+              <TouchableOpacity onPress={() => navigation.navigate('MealDetail', {email:item.email}) }>
+              <View style={{marginHorizontal:10,marginVertical:10}}>
+              <Image source={{uri: item.image}} style={{width:199,height:166}} />
+              <Text style={{width: 195,marginTop:10,fontWeight:'bold'}}>{item.title}</Text>
+              </View>
+              </TouchableOpacity>);
+          }}/>
+        </ScrollView>
+        <Text style={{marginLeft:10,fontWeight:'bold',fontSize:18}}>High Protein</Text>
+        <ScrollView>
+        <FlatList horizontal data={allChef[3]} keyExtractor={item => item._id} renderItem={({item}) => {
+            return(
+              <TouchableOpacity onPress={() => navigation.navigate('MealDetail', {email:item.email}) }>
+              <View style={{marginHorizontal:10,marginVertical:10}}>
+              <Image source={{uri: item.image}} style={{width:199,height:166}} />
+              <Text style={{width: 195,marginTop:10,fontWeight:'bold'}}>{item.title}</Text>
+              </View>
+              </TouchableOpacity>);
+          }}/>
+        </ScrollView>
+      </View>
     )
   } else if (role == "Chef") {
     if (chefMeal.mealType) {
@@ -88,7 +144,12 @@ const HomeScreen = ({ navigation }) => {
 };
 
 HomeScreen.navigationOptions = {
-  title: 'MealPal'
+  title: 'MealPal',
+  headerRight: () => (
+    <TouchableOpacity onPress={() => navigate('Cart') }>
+      <Feather name='shopping-cart' size={25} style={{marginRight:15}}/>
+    </TouchableOpacity>
+  )
 };
 
 const styles = StyleSheet.create({

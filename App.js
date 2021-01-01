@@ -17,6 +17,9 @@ import { Provider as LocationProvider } from './src/context/LocationContext';
 import { Provider as TrackProvider } from './src/context/TrackContext';
 import { FontAwesome } from '@expo/vector-icons';
 import AddMealScreen from './src/screens/AddMealScreen';
+import MealDetailScreen from './src/screens/MealDetailScreen';
+import OrderDetailScreen from './src/screens/OrderDetailScreen';
+import CartScreen from './src/screens/CartScreen';
 
 const homeFlow = createStackNavigator({
   Home: HomeScreen,
@@ -41,7 +44,15 @@ const switchNavigator = createSwitchNavigator({
     Account: AccountScreen,
   }),
   chefFlow: createStackNavigator({
-    AddMeal: AddMealScreen
+    AddMeal: AddMealScreen,
+  }),
+  custFlow: createStackNavigator({
+    Home: HomeScreen,
+    MealDetail: MealDetailScreen
+  }),
+  cartFlow: createStackNavigator({
+    Home: HomeScreen,
+    Cart: CartScreen
   })
 });
 
