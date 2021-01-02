@@ -6,6 +6,8 @@ import * as ImagePicker from 'expo-image-picker';
 import {FontAwesome5} from '@expo/vector-icons';
 import { navigate } from '../navigationRef';
 import mealpalApi from '../api/mealpal';
+import { utils } from '@react-native-firebase/app';
+import storage from '@react-native-firebase/storage';
 
 const AddMealScreen = ({navigation}) => {
     const [image, setImage] = useState({uri:'https://firebasestorage.googleapis.com/v0/b/mealpal-b97b8.appspot.com/o/meal_default_image.png?alt=media&token=c73cc96f-cfc0-4f68-a769-8aa187fe73aa'});
@@ -25,8 +27,7 @@ const AddMealScreen = ({navigation}) => {
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
           aspect: [4, 3],
-          quality: 0.1,
-          base64: true
+          quality: 0.1
         });
     
         if (!result.cancelled) {
@@ -34,7 +35,7 @@ const AddMealScreen = ({navigation}) => {
         }
       };
 
-      const submitForm = () => {
+      const submitForm = async () => {
         var errMsg = []
         if (image.uri == "" || image.uri == 'https://firebasestorage.googleapis.com/v0/b/mealpal-b97b8.appspot.com/o/meal_default_image.png?alt=media&token=c73cc96f-cfc0-4f68-a769-8aa187fe73aa') {
             errMsg.push("No Image")
@@ -66,10 +67,17 @@ const AddMealScreen = ({navigation}) => {
         if (errMsg.length > 0) {
             setErrorMessage(errMsg.join(", "))
         } else {
-            var downloadUrl = "data:image/jpg;base64," + image.base64
-                mealpalApi.post('/updateChefMeal', { downloadUrl, mealType, title, description, ingredients, calories, carbs, fats, protein }).then(() => {
-                    navigate('Home');
-                })
+            var reference = storage().ref(`/meal_images/${image.uri.substring(133)}`);
+            reference.putFile(image.uri).then(async res => {
+                var downloadUrl = await storage()
+                    .ref(`/meal_images/${image.uri.substring(133)}`)
+                    .getDownloadURL();
+                console.log(downloadUrl);
+            })
+            // var downloadUrl = "data:image/jpg;base64," + image.base64
+            //     mealpalApi.post('/updateChefMeal', { downloadUrl, mealType, title, description, ingredients, calories, carbs, fats, protein }).then(() => {
+            //         navigate('Home');
+            //     })
         }
       }
     return (
