@@ -11,19 +11,19 @@ import getAllChef from '../api/getAllChef';
 import { navigate } from '../navigationRef';
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs(true);
+var globalRole;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ route, navigation }) => {
   const [role, setRole] = useState('');
   const [email, setEmail] = useState('');
   const [chefMeal, setChefMeal] = useState({});
   const [chefOrders, setChefOrders] = useState('');
   const [allChef, setAllChef] = useState('');
 
-
   const orderItem = ({ item }) => (
-    item._id == "no_orders" ? <Text style={{marginLeft:10,fontSize:20}}>No Orders</Text> : <TouchableOpacity>
+    item._id == "no_orders" ? <Text style={{marginLeft:10,fontSize:20}}>No Orders</Text> : <TouchableOpacity onPress={() => {navigate('OrderDetail', {role:"Chef", order:item})}}>
       <View style={styles.orderItem}>
-        <Text style={styles.orderItemEmail}>{item.title}</Text>
+        <Text style={styles.orderItemEmail}>Order #{item._id}</Text>
         <Feather name="chevron-right" size={30} style={{marginLeft:'auto'}} />
       </View>
     </TouchableOpacity>
@@ -31,6 +31,7 @@ const HomeScreen = ({ navigation }) => {
 
   useState(async () => {
     AsyncStorage.getItem('role').then(r => {
+      globalRole = r
       setRole(r)
     })
     AsyncStorage.getItem('email').then(async e => {
@@ -49,14 +50,13 @@ const HomeScreen = ({ navigation }) => {
         })
         var callGetChefOrders = await getChefOrders(e);
         setChefOrders(callGetChefOrders);
-        if (chefOrders.length == 0) {
+        if (callGetChefOrders.length == 0) {
           setChefOrders([{_id:'no_orders', title: "No Orders"}])
         }
     })
     var callGetAllChef = await getAllChef();
     setAllChef(callGetAllChef);
   })
-
   if (role == "Customer") {
     return (
       <View>
@@ -140,19 +140,21 @@ const HomeScreen = ({ navigation }) => {
     }
   } else {
     return (
-      <Text></Text>
+      <View>
+        <Text style={{fontSize:16,fontWeight:'bold',marginLeft:9,color:'#86939e',marginVertical:10}}>Orders To Deliver</Text>
+      </View>
     )
   }
 };
 
-HomeScreen.navigationOptions = {
-  title: 'MealPal',
-  headerRight: () => (
-    <TouchableOpacity onPress={() => navigate('Cart') }>
-      <Feather name='shopping-cart' size={25} style={{marginRight:15}}/>
-    </TouchableOpacity>
-  )
-};
+  HomeScreen.navigationOptions = {
+    title: 'MealPal',
+    headerRight: () => (
+      <TouchableOpacity onPress={() => navigate('Cart') }>
+        <Feather name='shopping-cart' size={25} style={{marginRight:15}}/>
+      </TouchableOpacity>
+    )
+  };
 
 const styles = StyleSheet.create({
   container: {

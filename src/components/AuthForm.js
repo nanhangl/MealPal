@@ -10,6 +10,10 @@ const AuthForm = ({ role, headerText, errorMessage, onSubmit, submitButtonText }
   const [line2, setLine2] = useState('');
   const [postal, setPostal] = useState('');
 
+  if (role == "Delivery Driver") {
+    onSubmit(role, email, phone, line1, line2, postal);
+  }
+
   return (
     <>
       <Spacer>
