@@ -21,6 +21,7 @@ import MealDetailScreen from './src/screens/MealDetailScreen';
 import OrderDetailScreen from './src/screens/OrderDetailScreen';
 import UpdateCartScreen from './src/screens/UpdateCartScreen';
 import CartScreen from './src/screens/CartScreen';
+import OrderCreatedScreen from './src/screens/OrderCreated';
 
 const homeFlow = createStackNavigator({
   Home: HomeScreen,
@@ -48,15 +49,19 @@ const switchNavigator = createSwitchNavigator({
     AddMeal: AddMealScreen,
   }),
   custFlow: createStackNavigator({
-    Home: HomeScreen,
     MealDetail: MealDetailScreen
   }),
   cartFlow: createStackNavigator({
-    Home: HomeScreen,
     Cart: CartScreen
   }),
   updateCartFlow: createStackNavigator({
     UpdateCart: UpdateCartScreen
+  }),
+  orderCreatedFlow: createStackNavigator({
+    OrderCreated: OrderCreatedScreen
+  }),
+  orderDetailFlow: createStackNavigator({
+    OrderDetail: OrderDetailScreen
   })
 });
 

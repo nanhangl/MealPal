@@ -6,6 +6,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import getChef from '../api/getChef'
 import {Feather} from '@expo/vector-icons';
 import { navigate } from '../navigationRef';
+import createOrder from '../api/createOrder';
 
 const CartScreen = ({navigation}) => {
     const [cart, setCart] = useState([]);
@@ -33,8 +34,18 @@ const CartScreen = ({navigation}) => {
         }
     })
 
-    const checkoutCart = () => {
-        
+    const checkoutCart = async () => {
+        if (cart.length > 0) {
+            var chefEmailArray = [];
+            for (cartItem in cart) {
+                chefEmailArray.push(JSON.parse(cart[cartItem]).email)
+            }
+            var orderCreation = await createOrder(chefEmailArray);
+            if (orderCreation == "ok") {
+                AsyncStorage.removeItem('cart');
+                navigate('OrderCreated');
+            }
+        }
     }
 
     return (
@@ -61,6 +72,15 @@ const CartScreen = ({navigation}) => {
         </View>
     )
 };
+
+CartScreen.navigationOptions = {
+    title: 'Cart',
+    headerLeft: () => (
+      <TouchableOpacity onPress={() => navigate('Home') }>
+        <Feather name='arrow-left' size={25} style={{marginLeft:15}}/>
+      </TouchableOpacity>
+    )
+  };
 
 const styles = StyleSheet.create({
     image: {

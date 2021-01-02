@@ -8,6 +8,7 @@ import { navigate } from '../navigationRef';
 import mealpalApi from '../api/mealpal';
 import getChef from '../api/getChef'
 import AsyncStorage from '@react-native-community/async-storage';
+import {Feather} from '@expo/vector-icons';
 
 const MealDetailScreen = ({navigation}) => {
     const [mealObj, setMealObj] = useState({});
@@ -88,6 +89,15 @@ const MealDetailScreen = ({navigation}) => {
                 </ScrollView>
             )
 };
+
+MealDetailScreen.navigationOptions = {
+    title: 'Meal Detail',
+    headerLeft: () => (
+      <TouchableOpacity onPress={() => navigate('Home') }>
+        <Feather name='arrow-left' size={25} style={{marginLeft:15}}/>
+      </TouchableOpacity>
+    )
+  };
 
 const styles = StyleSheet.create({
     image: {
