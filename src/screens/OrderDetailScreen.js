@@ -13,6 +13,7 @@ import { FlatList } from 'react-native-gesture-handler';
 
 const OrderDetailScreen = ({navigation}) => {
 const [meals, setMeals] = useState('');
+const [deliveryAddress, setDeliveryAddress] = useState(''); 
 var role = navigation.getParam('role')
 var order = navigation.getParam('order')
 
@@ -24,6 +25,7 @@ useState(async () => {
         mealObjArray.push(JSON.stringify(mealObj[0]))
     }
     setMeals(mealObjArray)
+    
 })
 
     if (role == 'Customer') {
@@ -75,11 +77,18 @@ useState(async () => {
                 <Text>{order.status}</Text>
                 <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Delivery Date</Text>
                 <Text>{order.deliveryDate != undefined ? order.deliveryDate.substring(0,10) : "Not Applicable"}</Text>
-                <View style={{marginTop:20}} />
             </View>
         )
     } else {
-        <View></View>
+        <View style={{margin:10}}>
+                <Text style={{fontSize:18,fontWeight:'bold'}}>Order #{order._id}</Text>
+                <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Status</Text>
+                <Text>{order.status}</Text>
+                <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Delivery Date</Text>
+                <Text>{order.deliveryDate != undefined ? order.deliveryDate.substring(0,10) : "Not Applicable"}</Text>
+                <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Deliver To</Text>
+                <Text>{order.customerEmail}</Text>
+        </View>
     }
     
 };

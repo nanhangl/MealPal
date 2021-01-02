@@ -10,6 +10,7 @@ import getChefOrders from '../api/getChefOrders';
 import getAllChef from '../api/getAllChef';
 import { navigate } from '../navigationRef';
 import { LogBox } from 'react-native';
+import getOrdersToDeliver from '../api/getOrdersToDeliver';
 LogBox.ignoreAllLogs(true);
 var globalRole;
 
@@ -19,11 +20,15 @@ const HomeScreen = ({ route, navigation }) => {
   const [chefMeal, setChefMeal] = useState({});
   const [chefOrders, setChefOrders] = useState('');
   const [allChef, setAllChef] = useState('');
+  const [ordersToDeliver, setOrdersToDeliver] = useState('');
 
   const orderItem = ({ item }) => (
     item._id == "no_orders" ? <Text style={{marginLeft:10,fontSize:20}}>No Orders</Text> : <TouchableOpacity onPress={() => {navigate('OrderDetail', {role:"Chef", order:item})}}>
       <View style={styles.orderItem}>
+        <View>
         <Text style={styles.orderItemEmail}>Order #{item._id}</Text>
+        <Text>Prepare by {item.deliveryDate.substring(0,10)}</Text>
+        </View>
         <Feather name="chevron-right" size={30} style={{marginLeft:'auto'}} />
       </View>
     </TouchableOpacity>
@@ -56,10 +61,13 @@ const HomeScreen = ({ route, navigation }) => {
     })
     var callGetAllChef = await getAllChef();
     setAllChef(callGetAllChef);
+    var ordersToDeliverArray = await getOrdersToDeliver();
+    setOrdersToDeliver(ordersToDeliverArray);
   })
   if (role == "Customer") {
     return (
       <View>
+        <View></View>
         <Text style={{marginLeft:10,fontWeight:'bold',fontSize:18}}>Keto</Text>
         <ScrollView>
         <FlatList horizontal data={allChef[0]} keyExtractor={item => item._id} renderItem={({item}) => {
@@ -142,6 +150,19 @@ const HomeScreen = ({ route, navigation }) => {
     return (
       <View>
         <Text style={{fontSize:16,fontWeight:'bold',marginLeft:9,color:'#86939e',marginVertical:10}}>Orders To Deliver</Text>
+        <FlatList data={ordersToDeliver} keyExtractor={item => JSON.stringify(item)} renderItem={({item}) => {
+          return (
+            <TouchableOpacity onPress={() => {navigate('OrderDetail', {role:"Delivery Driver", order:item})}}>
+            <View style={styles.orderItem}>
+            <View>
+            <Text style={styles.orderItemEmail}>Order #{item._id}</Text>
+            <Text>Deliver on {item.deliveryDate.substring(0,10)}</Text>
+            </View>
+            <Feather name="chevron-right" size={30} style={{marginLeft:'auto'}} />
+            </View>
+            </TouchableOpacity>
+          )
+        }} />
       </View>
     )
   }
