@@ -9,6 +9,8 @@ import AsyncStorage from '@react-native-community/async-storage';
 import getChefOrders from '../api/getChefOrders';
 import getAllChef from '../api/getAllChef';
 import { navigate } from '../navigationRef';
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs(true);
 
 const HomeScreen = ({ navigation }) => {
   const [role, setRole] = useState('');

@@ -19,6 +19,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import AddMealScreen from './src/screens/AddMealScreen';
 import MealDetailScreen from './src/screens/MealDetailScreen';
 import OrderDetailScreen from './src/screens/OrderDetailScreen';
+import UpdateCartScreen from './src/screens/UpdateCartScreen';
 import CartScreen from './src/screens/CartScreen';
 
 const homeFlow = createStackNavigator({
@@ -53,6 +54,9 @@ const switchNavigator = createSwitchNavigator({
   cartFlow: createStackNavigator({
     Home: HomeScreen,
     Cart: CartScreen
+  }),
+  updateCartFlow: createStackNavigator({
+    UpdateCart: UpdateCartScreen
   })
 });
 

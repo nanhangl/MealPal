@@ -67,6 +67,7 @@ const signin = dispatch => async ({ role, email }) => {
 
 const signout = dispatch => async () => {
   await AsyncStorage.removeItem('token');
+  await AsyncStorage.removeItem('cart');
   dispatch({ type: 'signout' });
   navigate('loginFlow');
 };
