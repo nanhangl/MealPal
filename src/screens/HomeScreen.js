@@ -66,8 +66,8 @@ const HomeScreen = ({ route, navigation }) => {
   })
   if (role == "Customer") {
     return (
-      <View>
-        <View></View>
+      <ScrollView>
+        <View style={{marginTop:10}}></View>
         <Text style={{marginLeft:10,fontWeight:'bold',fontSize:18}}>Keto</Text>
         <ScrollView>
         <FlatList horizontal data={allChef[0]} keyExtractor={item => item._id} renderItem={({item}) => {
@@ -118,7 +118,7 @@ const HomeScreen = ({ route, navigation }) => {
               </TouchableOpacity>);
           }}/>
         </ScrollView>
-      </View>
+      </ScrollView>
     )
   } else if (role == "Chef") {
     if (chefMeal.mealType) {

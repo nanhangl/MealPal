@@ -6,8 +6,52 @@ import * as ImagePicker from 'expo-image-picker';
 import {FontAwesome5} from '@expo/vector-icons';
 import { navigate } from '../navigationRef';
 import mealpalApi from '../api/mealpal';
-import { utils } from '@react-native-firebase/app';
-import storage from '@react-native-firebase/storage';
+import * as firebase from 'firebase';
+import uuid from 'uuid';
+
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+    apiKey: "AIzaSyBFW_RA0aBHxa31nvvC4mdLzpL5rpVVmwg",
+    authDomain: "mealpal-b97b8.firebaseapp.com",
+    projectId: "mealpal-b97b8",
+    storageBucket: "mealpal-b97b8.appspot.com",
+    messagingSenderId: "631819321871",
+    appId: "1:631819321871:web:ef5a0e2bfc8ab32182997a",
+    measurementId: "G-JRY2226R1K"
+  };
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+async function uploadImageAsync(uri) {
+    // Why are we using XMLHttpRequest? See:
+    // https://github.com/expo/expo/issues/2402#issuecomment-443726662
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function() {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function(e) {
+        console.log(e);
+        reject(new TypeError('Network request failed'));
+      };
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true);
+      xhr.send(null);
+    });
+  
+    const ref = firebase
+      .storage()
+      .ref()
+      .child(uuid.v4());
+    const snapshot = await ref.put(blob);
+  
+    // We're done with the blob, close and release it
+    blob.close();
+  
+    return await snapshot.ref.getDownloadURL();
+  }
 
 const AddMealScreen = ({navigation}) => {
     const [image, setImage] = useState({uri:'https://firebasestorage.googleapis.com/v0/b/mealpal-b97b8.appspot.com/o/meal_default_image.png?alt=media&token=c73cc96f-cfc0-4f68-a769-8aa187fe73aa'});
@@ -27,7 +71,7 @@ const AddMealScreen = ({navigation}) => {
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
           aspect: [4, 3],
-          quality: 0.1
+          quality: 1
         });
     
         if (!result.cancelled) {
@@ -67,17 +111,10 @@ const AddMealScreen = ({navigation}) => {
         if (errMsg.length > 0) {
             setErrorMessage(errMsg.join(", "))
         } else {
-            var reference = storage().ref(`/meal_images/${image.uri.substring(133)}`);
-            reference.putFile(image.uri).then(async res => {
-                var downloadUrl = await storage()
-                    .ref(`/meal_images/${image.uri.substring(133)}`)
-                    .getDownloadURL();
-                console.log(downloadUrl);
+            var downloadUrl = await uploadImageAsync(image.uri);
+            mealpalApi.post('/updateChefMeal', { downloadUrl, mealType, title, description, ingredients, calories, carbs, fats, protein }).then(() => {
+                navigate('Home');
             })
-            // var downloadUrl = "data:image/jpg;base64," + image.base64
-            //     mealpalApi.post('/updateChefMeal', { downloadUrl, mealType, title, description, ingredients, calories, carbs, fats, protein }).then(() => {
-            //         navigate('Home');
-            //     })
         }
       }
     return (
