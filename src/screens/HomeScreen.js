@@ -156,7 +156,7 @@ const HomeScreen = ({ route, navigation }) => {
             <View style={styles.orderItem}>
             <View>
             <Text style={styles.orderItemEmail}>Order #{item._id}</Text>
-            <Text>Deliver on {item.deliveryDate.substring(0,10)}</Text>
+            <Text>Deliver {item.meals.length} Meal(s) on {item.deliveryDate.substring(0,10)}</Text>
             </View>
             <Feather name="chevron-right" size={30} style={{marginLeft:'auto'}} />
             </View>

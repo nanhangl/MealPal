@@ -20,14 +20,12 @@ const HistoryScreen = () => {
   useState(async () => {
     AsyncStorage.getItem('role').then(async r => {
       setRole(r)
-      if (r == "Customer") {
         var orderHistory = await getOrderHistory(r);
         var orderHistoryArray = []
         for (orderItem in orderHistory) {
           orderHistoryArray.push(JSON.stringify(orderHistory[orderItem]))
         }
         setHistory(orderHistoryArray);
-      }
     })
   })
 
@@ -54,23 +52,47 @@ const HistoryScreen = () => {
     );
   } else if (role == "Chef") {
     return (
-      <View>
-
-      </View>
-    );
-  } else if (role == "Delivery Driver") {
-    return (
-      <View>
-
+      <View style={{marginTop:20,marginHorizontal:10}}>
+        <FlatList data={history} keyExtractor={item => item} renderItem={({item}) => {
+          return (
+            <TouchableOpacity onPress={() => {
+              navigate('OrderDetail', {role:role, order:item})
+            }}>
+            <View style={{borderTopWidth:1,borderBottomWidth:1,borderTopColor:'#d0d0d0',borderBottomColor:'#d0d0d0',paddingVertical:20,flexDirection:'row',alignItems:'center'}}>
+              <View>
+                <Text style={{fontSize:18,fontWeight:'bold'}}>Order #{JSON.parse(item)._id}</Text>
+                <Text style={{marginTop:10}}>{JSON.parse(item).meals.length} Meal(s)</Text>
+                <Text style={{fontSize:18,marginTop:10}}>{JSON.parse(item).status}</Text>
+              </View>
+              <Feather name="chevron-right" size={30} style={{marginLeft:'auto'}} />
+            </View>
+            </TouchableOpacity>
+          )
+        }} />
       </View>
     );
   } else {
     return (
-      <View>
-
+      <View style={{marginTop:20,marginHorizontal:10}}>
+        <FlatList data={history} keyExtractor={item => item} renderItem={({item}) => {
+          return (
+            <TouchableOpacity onPress={() => {
+              navigate('OrderDetail', {role:role, order:JSON.parse(item)})
+            }}>
+            <View style={{borderTopWidth:1,borderBottomWidth:1,borderTopColor:'#d0d0d0',borderBottomColor:'#d0d0d0',paddingVertical:20,flexDirection:'row',alignItems:'center'}}>
+              <View>
+                <Text style={{fontSize:18,fontWeight:'bold'}}>Order #{JSON.parse(item)._id}</Text>
+                <Text style={{marginTop:10}}>{JSON.parse(item).meals.length} Meal(s)</Text>
+                <Text style={{fontSize:18,marginTop:10}}>{JSON.parse(item).status}</Text>
+              </View>
+              <Feather name="chevron-right" size={30} style={{marginLeft:'auto'}} />
+            </View>
+            </TouchableOpacity>
+          )
+        }} />
       </View>
     );
-  }
+  } 
 };
 
 HistoryScreen.navigationOptions = {

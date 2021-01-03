@@ -10,14 +10,18 @@ import getChef from '../api/getChef'
 import AsyncStorage from '@react-native-community/async-storage';
 import {Feather} from '@expo/vector-icons';
 import { FlatList } from 'react-native-gesture-handler';
+import getCust from '../api/getCust';
+import updateOrderStatus from '../api/updateOrderStatus';
 
 const OrderDetailScreen = ({navigation}) => {
 const [meals, setMeals] = useState('');
-const [deliveryAddress, setDeliveryAddress] = useState(''); 
+const [customer, setCustomer] = useState({}); 
+const [chefObj, setChefObj] = useState('');
 var role = navigation.getParam('role')
-var order = navigation.getParam('order')
+var order = JSON.stringify(navigation.getParam('order'))
 
 useState(async () => {
+    try {
     var mealsArray = JSON.parse(order).meals
     var mealObjArray = [];
     for (mealItem in mealsArray) {
@@ -25,7 +29,13 @@ useState(async () => {
         mealObjArray.push(JSON.stringify(mealObj[0]))
     }
     setMeals(mealObjArray)
-    
+    } catch {}
+    try {
+    var custArr = await getCust(JSON.parse(order).customerEmail)
+    if (custArr.length > 0) {
+        setCustomer(custArr[0])
+    }
+    } catch {}
 })
 
     if (role == 'Customer') {
@@ -72,23 +82,80 @@ useState(async () => {
     } else if (role == "Chef") {
         return (
             <View style={{margin:10}}>
-                <Text style={{fontSize:18,fontWeight:'bold'}}>Order #{order._id}</Text>
+                <Text style={{fontSize:18,fontWeight:'bold'}}>Order #{JSON.parse(order)._id}</Text>
                 <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Status</Text>
-                <Text>{order.status}</Text>
+                <Text>{JSON.parse(order).status}</Text>
                 <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Delivery Date</Text>
-                <Text>{order.deliveryDate != undefined ? order.deliveryDate.substring(0,10) : "Not Applicable"}</Text>
+                <Text>{JSON.parse(order).deliveryDate != undefined ? JSON.parse(order).deliveryDate.substring(0,10) : "Not Applicable"}</Text>
             </View>
         )
     } else {
-        <View style={{margin:10}}>
-                <Text style={{fontSize:18,fontWeight:'bold'}}>Order #{order._id}</Text>
-                <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Status</Text>
-                <Text>{order.status}</Text>
-                <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Delivery Date</Text>
-                <Text>{order.deliveryDate != undefined ? order.deliveryDate.substring(0,10) : "Not Applicable"}</Text>
-                <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Deliver To</Text>
-                <Text>{order.customerEmail}</Text>
-        </View>
+        if (JSON.parse(order).status == 'Delivered') {
+            return (
+                <View style={{margin:10}}>
+                        <Text style={{fontSize:18,fontWeight:'bold'}}>Order #{JSON.parse(order)._id}</Text>
+                        <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Status</Text>
+                        <Text>{JSON.parse(order).status}</Text>
+                        <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Delivery Date</Text>
+                        <Text>{JSON.parse(order).deliveryDate != undefined ? JSON.parse(order).deliveryDate.substring(0,10) : "Not Applicable"}</Text>
+                        <Text style={{fontSize:20,fontWeight:'bold',color:'#86939e',marginBottom:10,marginTop:30}}>Collect From</Text>
+                        <FlatList data={meals} keyExtractor={item => item} renderItem={({item}) => {
+                            return (
+                                <View style={{flexDirection:'row',alignItems:'center',borderTopWidth:1,borderBottomWidth:1,borderColor:'#d0d0d0',paddingVertical:10}}>
+                                    <View style={{width:250}}>
+                                    <Text>{JSON.parse(item).title}</Text>
+                                    <Text>Tel: {JSON.parse(item).phone}</Text>
+                                    <Text style={{fontSize:20}}>{JSON.parse(item).address}</Text>
+                                    </View>
+                                </View>
+                            )
+                        }} />
+                        <Text style={{fontSize:20,fontWeight:'bold',color:'#86939e',marginTop:30,marginBottom:10}}>Deliver To</Text>
+                        <View style={{borderTopWidth:1,borderBottomWidth:1,borderColor:'#d0d0d0',paddingVertical:10}}>
+                        <Text>Tel: {customer.phone}</Text>
+                        <Text style={{fontSize:20}}>{customer.address}</Text>
+                        </View>
+                        <View style={{marginTop:50}}>
+                        </View>
+                </View>
+            )
+        }
+        return (
+            <View style={{margin:10}}>
+                    <Text style={{fontSize:18,fontWeight:'bold'}}>Order #{JSON.parse(order)._id}</Text>
+                    <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Status</Text>
+                    <Text>{JSON.parse(order).status}</Text>
+                    <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Delivery Date</Text>
+                    <Text>{JSON.parse(order).deliveryDate != undefined ? JSON.parse(order).deliveryDate.substring(0,10) : "Not Applicable"}</Text>
+                    <Text style={{fontSize:20,fontWeight:'bold',color:'#86939e',marginBottom:10,marginTop:30}}>Collect From</Text>
+                    <FlatList data={meals} keyExtractor={item => item} renderItem={({item}) => {
+                        return (
+                            <View style={{flexDirection:'row',alignItems:'center',borderTopWidth:1,borderBottomWidth:1,borderColor:'#d0d0d0',paddingVertical:10}}>
+                                <View style={{width:250}}>
+                                <Text>{JSON.parse(item).title}</Text>
+                                <Text>Tel: {JSON.parse(item).phone}</Text>
+                                <Text style={{fontSize:20}}>{JSON.parse(item).address}</Text>
+                                </View>
+                            </View>
+                        )
+                    }} />
+                    <Text style={{fontSize:20,fontWeight:'bold',color:'#86939e',marginTop:30,marginBottom:10}}>Deliver To</Text>
+                    <View style={{borderTopWidth:1,borderBottomWidth:1,borderColor:'#d0d0d0',paddingVertical:10}}>
+                    <Text>Tel: {customer.phone}</Text>
+                    <Text style={{fontSize:20}}>{customer.address}</Text>
+                    </View>
+                    <View style={{marginTop:50}}>
+                    {JSON.parse(order).status == "Preparing" ? <Button title="All Meals Collected" onPress={async () => {
+                        await updateOrderStatus(JSON.parse(order)._id, "Delivering")
+                        var updatedOrder = JSON.parse(order)
+                        updatedOrder.status = "Delivering"
+                        navigate('UpdateOrder', {role:role, order:updatedOrder})
+                    }} /> : <Button title="Meal Delivered" onPress={() => {
+                        navigate('OrderDelivered', {order:JSON.parse(order), customer:customer})
+                    }} /> }
+                    </View>
+            </View>
+        )
     }
     
 };
