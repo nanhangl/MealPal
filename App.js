@@ -24,6 +24,8 @@ import CartScreen from './src/screens/CartScreen';
 import OrderCreatedScreen from './src/screens/OrderCreated';
 import UpdateOrderScreen from './src/screens/UpdateOrderScreen';
 import OrderDeliveredScreen from './src/screens/OrderDelivered';
+import ReviewScreen from './src/screens/ReviewScreen';
+import SubmitReviewScreen from './src/screens/SubmitReview';
 
 const homeFlow = createStackNavigator({
   Home: HomeScreen,
@@ -51,14 +53,16 @@ const switchNavigator = createSwitchNavigator({
     AddMeal: AddMealScreen,
   }),
   custFlow: createStackNavigator({
-    MealDetail: MealDetailScreen
+    MealDetail: MealDetailScreen,
+    Review: ReviewScreen
   }),
   cartFlow: createStackNavigator({
     Cart: CartScreen
   }),
   updateThingsFlow: createStackNavigator({
     UpdateCart: UpdateCartScreen,
-    UpdateOrder: UpdateOrderScreen
+    UpdateOrder: UpdateOrderScreen,
+    SubmitReview: SubmitReviewScreen
 
   }),
   orderCreatedFlow: createStackNavigator({

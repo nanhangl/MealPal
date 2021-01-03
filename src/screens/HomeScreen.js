@@ -150,6 +150,7 @@ const HomeScreen = ({ route, navigation }) => {
     return (
       <View>
         <Text style={{fontSize:16,fontWeight:'bold',marginLeft:9,color:'#86939e',marginVertical:10}}>Orders To Deliver</Text>
+        {ordersToDeliver.length > 0 ?
         <FlatList data={ordersToDeliver} keyExtractor={item => JSON.stringify(item)} renderItem={({item}) => {
           return (
             <TouchableOpacity onPress={() => {navigate('OrderDetail', {role:"Delivery Driver", order:item})}}>
@@ -163,6 +164,7 @@ const HomeScreen = ({ route, navigation }) => {
             </TouchableOpacity>
           )
         }} />
+        : <Text style={{marginLeft:10,fontSize:20}}>No Orders</Text>}
       </View>
     )
   }

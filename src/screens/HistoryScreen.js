@@ -35,7 +35,7 @@ const HistoryScreen = () => {
         <FlatList data={history} keyExtractor={item => item} renderItem={({item}) => {
           return (
             <TouchableOpacity onPress={() => {
-              navigate('OrderDetail', {role:role, order:item})
+              navigate('OrderDetail', {role:role, order:JSON.parse(item)})
             }}>
             <View style={{borderTopWidth:1,borderBottomWidth:1,borderTopColor:'#d0d0d0',borderBottomColor:'#d0d0d0',paddingVertical:20,flexDirection:'row',alignItems:'center'}}>
               <View>

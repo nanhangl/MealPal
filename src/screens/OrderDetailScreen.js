@@ -4,6 +4,7 @@ import {Input, Image, Button} from 'react-native-elements';
 import {Picker} from '@react-native-picker/picker'
 import * as ImagePicker from 'expo-image-picker';
 import {FontAwesome5} from '@expo/vector-icons';
+import MapView, {Circle} from 'react-native-maps';
 import { navigate } from '../navigationRef';
 import mealpalApi from '../api/mealpal';
 import getChef from '../api/getChef'
@@ -12,6 +13,7 @@ import {Feather} from '@expo/vector-icons';
 import { FlatList } from 'react-native-gesture-handler';
 import getCust from '../api/getCust';
 import updateOrderStatus from '../api/updateOrderStatus';
+import { Rating, AirbnbRating } from 'react-native-ratings';
 
 const OrderDetailScreen = ({navigation}) => {
 const [meals, setMeals] = useState('');
@@ -40,24 +42,40 @@ useState(async () => {
 
     if (role == 'Customer') {
         if (JSON.parse(order).status == "Delivered") {
+            var location = {latitude:JSON.parse(order).gps[0], longitude:JSON.parse(order).gps[1], latitudeDelta: 0.0005, longitudeDelta: 0.0005};
             return (
-                <View style={{margin:10}}>
+                <ScrollView style={{margin:10}}>
                     <Text style={{fontSize:18,fontWeight:'bold'}}>Order #{JSON.parse(order)._id}</Text>
                     <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Status</Text>
                     <Text>{JSON.parse(order).status}</Text>
                     <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Delivery Proof</Text>
-                    <Image source={{uri: JSON.parse(order).deliveryPhoto}} style={{width:199,height:166}} />
-                    <Text>{JSON.parse(order).deliveredTime}</Text>
+                    <View style={{flexDirection:'row'}}>
+                    <Image source={{uri: JSON.parse(order).deliveryPhoto}} style={{width:190,height:150,marginTop:10}} />
+                        <MapView region={location} style={{width:190,height:150,marginHorizontal:10,marginTop:10}}>
+                        <Circle
+                            center={location}
+                            radius={10}
+                            strokeColor="rgba(158, 158, 255, 1.0)"
+                            fillColor="rgba(158, 158, 255, 0.3)"
+                        />
+                        </MapView>
+                    </View>
+                    <Text style={{marginTop:10}}>Delivered on {JSON.parse(order).deliveredTime.substring(0,10)} {JSON.parse(order).deliveredTime.substring(11,16)}</Text>
                     <Text style={{fontSize:16,fontWeight:'bold',color:'#86939e',marginTop:10}}>Meal(s) Ordered ({JSON.parse(order).meals.length})</Text>
                     <FlatList data={meals} keyExtractor={item => item} renderItem={({item}) => {
                     return (
                         <View style={{flexDirection:'row',alignItems:'center',marginTop:10}}>
                             <Image source={{uri: JSON.parse(item).image}} style={{width:100,height:67}} />
+                            <View>
                             <Text style={{fontSize:16,fontWeight:'bold',marginLeft:10,width:250}}>{JSON.parse(item).title}</Text>
+                            <Text style={{color:'#3178C6',marginLeft:10}} onPress={() => {
+                                navigate('Review', {chef:JSON.parse(item)})
+                            }}>Give Review</Text>
+                            </View>
                         </View>
                     )
                 }} />
-                </View>
+                </ScrollView>
             )
         } else {
             return (

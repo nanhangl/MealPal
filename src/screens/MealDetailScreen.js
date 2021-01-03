@@ -12,6 +12,7 @@ import {Feather} from '@expo/vector-icons';
 
 const MealDetailScreen = ({navigation}) => {
     const [mealObj, setMealObj] = useState({});
+    const [chefInfo, setChefInfo] = useState('');
     const [image, setImage] = useState({uri:'https://firebasestorage.googleapis.com/v0/b/mealpal-b97b8.appspot.com/o/meal_default_image.png?alt=media&token=c73cc96f-cfc0-4f68-a769-8aa187fe73aa'});
     const [itemInCart, setItemInCart] = useState(false);
     const mealEmail = navigation.getParam('email');
@@ -22,6 +23,7 @@ const MealDetailScreen = ({navigation}) => {
 
     useState(async () => {
         var chefObj = await getChef(mealEmail);
+        setChefInfo(chefObj[0]);
         setMealObj({
           mealType: chefObj[0].mealType,
           image: chefObj[0].image,
@@ -79,7 +81,9 @@ const MealDetailScreen = ({navigation}) => {
                             </View>
                         </View>
                     <View style={{marginHorizontal:10,flexDirection:'row',justifyContent:'space-between'}}>
-                    <Button title="&nbsp;&nbsp;See Reviews&nbsp;&nbsp;" />
+                    <Button title="&nbsp;&nbsp;See Reviews&nbsp;&nbsp;" onPress={() => {
+                        navigate('Review', {chef:chefInfo})
+                    }} />
                     <Button disabled={itemInCart} title="&nbsp;&nbsp;Add to Cart&nbsp;&nbsp;" onPress={() => {
                             if (mealObj.title != undefined) {
                             navigate('Cart', {email:mealEmail, title:mealObj.title})
