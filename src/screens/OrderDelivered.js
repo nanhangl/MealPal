@@ -63,6 +63,7 @@ const OrderDeliveredScreen = ({navigation}) => {
     var customerObj = navigation.getParam('customer');
 
     useState(async () => {
+      await Location.requestPermissionsAsync({})
         let gpsdata = await Location.getCurrentPositionAsync({});
         var gpsdataObj = {latitude: gpsdata.coords.latitude, longitude: gpsdata.coords.longitude, latitudeDelta: 0.0005, longitudeDelta: 0.0005}
         setLocation(gpsdataObj);
