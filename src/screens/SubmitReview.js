@@ -3,7 +3,7 @@ import {Text, StyleSheet } from 'react-native';
 import { navigate } from '../navigationRef';
 
 const SubmitReviewScreen = ({navigation}) => {
-    navigate('ReviewScreen', {chef:navigation.getParam('chef')});
+    navigate('Review', {chef:navigation.getParam('chef')});
     return (
         <Text>Updating</Text>
     )

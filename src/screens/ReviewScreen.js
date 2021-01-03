@@ -53,7 +53,7 @@ const ReviewScreen = ({navigation}) => {
                 </View>
             <Text style={{fontSize:16,fontWeight:'bold',marginLeft:19,marginVertical:20,color:'#86939e'}}>All Reviews</Text>
             <ScrollView>
-                <FlatList data={reviews} keyExtractor={item => item} renderItem={({item}) => {
+                <FlatList data={reviews} keyExtractor={item => JSON.stringify(item)} renderItem={({item}) => {
                     return (
                         <View style={{borderColor:'#d0d0d0',borderTopWidth:1,borderBottomWidth:1,paddingVertical:10}}>
                             <AirbnbRating defaultRating={item.rating} showRating={false} starContainerStyle={{marginLeft:-150}} />
